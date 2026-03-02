@@ -69,9 +69,9 @@ Rewynd Packaging
 
 Below is a sample generated sticker output:
 
-(<<img width="1717" height="984" alt="image" src="https://github.com/user-attachments/assets/d6ad7302-8423-4b02-b174-b594e1719a9d" />
+<img width="1717" height="984" alt="image" src="https://github.com/user-attachments/assets/d6ad7302-8423-4b02-b174-b594e1719a9d" />
 >
-)
+
 
 ---
 
