@@ -65,6 +65,13 @@ Rewynd Packaging
 | Packaging Details | Quantity structure |
 | No. of Bundles | Total stickers to generate |
 
+## 📸 Output Preview
+
+Below is a sample generated sticker output:
+
+![Generated Sticker Output](<img width="1122" height="806" alt="image" src="https://github.com/user-attachments/assets/c2e7777e-e098-4e8c-b781-4039950211c3" />
+)
+
 ---
 
 ## 📈 Future Improvements
