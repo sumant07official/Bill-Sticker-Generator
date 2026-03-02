@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sticker Generator</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      color: #222;
+    }
+
+    /* ── SCREEN LAYOUT ── */
+    .screen-wrapper {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 0 16px 60px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.6rem;
+      margin-bottom: 28px;
+      color: #1a1a2e;
+      letter-spacing: 0.5px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 28px 32px;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.08);
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #dde1e9;
+      border-radius: 8px;
+      font-size: 0.97rem;
+      color: #222;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #4f6ef7;
+    }
+
+    textarea { resize: vertical; min-height: 68px; }
+
+    select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #dde1e9;
+      border-radius: 8px;
+      font-size: 0.97rem;
+      color: #222;
+      outline: none;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      font-family: inherit;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23555' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+    }
+    select:focus { border-color: #4f6ef7; }
+
+    .bundle-hint {
+      font-size: 0.78rem;
+      color: #4f6ef7;
+      margin-top: 5px;
+      font-style: italic;
+    }
+
+    .row { display: flex; gap: 14px; }
+    .row .field { flex: 1; }
+
+    .btn-generate {
+      width: 100%;
+      margin-top: 8px;
+      padding: 13px;
+      background: #4f6ef7;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-generate:hover { background: #3a57e8; }
+
+    /* ── STICKER PREVIEW ── */
+    #preview-section {
+      display: none;
+      margin-top: 32px;
+    }
+
+    .preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .preview-header h2 {
+      font-size: 1.1rem;
+      color: #1a1a2e;
+    }
+
+    .btn-print {
+      padding: 9px 22px;
+      background: #22c55e;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-print:hover { background: #16a34a; }
+
+    .stickers-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .sticker {
+      border: 2px dashed #b0b8d1;
+      border-radius: 10px;
+      padding: 16px 18px;
+      background: #fff;
+      position: relative;
+    }
+
+    .sticker-number {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #4f6ef7;
+    }
+
+    .sticker-date {
+      font-size: 0.78rem;
+      color: #888;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    .sticker-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 5px;
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    .sticker-row .s-label {
+      font-weight: 700;
+      color: #444;
+      white-space: nowrap;
+      min-width: 60px;
+    }
+
+    .sticker-row .s-value {
+      color: #222;
+      word-break: break-word;
+    }
+
+    /* ── PRINT STYLES ── */
+    @media print {
+      body { background: #fff; }
+      .screen-wrapper { max-width: 100%; margin: 0; padding: 0; }
+      h1, .card, .preview-header { display: none !important; }
+      #preview-section { display: block !important; margin: 0; }
+      .stickers-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10mm;
+        padding: 8mm;
+      }
+      .sticker {
+        border: 1.5px solid #333;
+        border-radius: 0;
+        page-break-inside: avoid;
+        padding: 10px 12px;
+      }
+      .sticker-number { font-size: 1rem; }
+      .sticker-row { font-size: 0.82rem; }
+      .sticker-date { font-size: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="screen-wrapper">
+  <h1>📦 Sticker Generator</h1>
+
+  <div class="card">
+    <div class="field">
+      <label>Serial No.</label>
+      <input type="text" id="serial" placeholder="e.g. Emami Ivory 123456" />
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label>Size</label>
+        <input type="text" id="size" placeholder="e.g. 95*102cm" />
+      </div>
+      <div class="field">
+        <label>GSM</label>
+        <input type="text" id="gsm" placeholder="e.g. 250gsm" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Packaging Details</label>
+      <textarea id="packaging" placeholder="e.g. 500sh per packet, 4 packets per bundle, 15 bundles = 30,000sh" oninput="autoDetectBundles()"></textarea>
+    </div>
+
+    <div class="field">
+      <label>No. of Bundles (= Stickers)</label>
+      <select id="bundle-select" onchange="onBundleSelectChange()">
+        <option value="">— Select or auto-detect —</option>
+      </select>
+      <div class="bundle-hint" id="bundle-hint"></div>
+    </div>
+
+    <button class="btn-generate" onclick="generate()">Generate Stickers</button>
+  </div>
+
+  <!-- Preview -->
+  <div id="preview-section">
+    <div class="preview-header">
+      <h2 id="preview-title"></h2>
+      <button class="btn-print" onclick="window.print()">🖨️ Print</button>
+    </div>
+    <div class="stickers-grid" id="stickers-grid"></div>
+  </div>
+</div>
+
+<script>
+  function formatDate() {
+    const d = new Date();
+    const day   = String(d.getDate()).padStart(2,'0');
+    const month = d.toLocaleString('en-GB', { month: 'short' }).toUpperCase();
+    const year  = d.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
+  function parseBundles(packagingText) {
+    const match = packagingText.match(/(\d+)\s*bundle/i);
+    return match ? parseInt(match[1]) : null;
+  }
+
+  function populateBundleSelect(autoVal) {
+    const sel = document.getElementById('bundle-select');
+    const current = sel.value;
+    sel.innerHTML = '<option value="">— Select —</option>';
+    // Build option list: common values 1–50, plus auto-detected if outside range
+    const options = [];
+    for (let i = 1; i <= 50; i++) options.push(i);
+    if (autoVal && !options.includes(autoVal)) options.push(autoVal);
+    options.sort((a, b) => a - b);
+    options.forEach(n => {
+      const opt = document.createElement('option');
+      opt.value = n;
+      opt.textContent = `${n} bundle${n > 1 ? 's' : ''}`;
+      sel.appendChild(opt);
+    });
+    // Restore selection or auto-select detected value
+    if (autoVal) {
+      sel.value = autoVal;
+    } else if (current && current !== '') {
+      sel.value = current;
+    }
+  }
+
+  function autoDetectBundles() {
+    const packaging = document.getElementById('packaging').value.trim();
+    const detected = parseBundles(packaging);
+    const hint = document.getElementById('bundle-hint');
+    populateBundleSelect(detected);
+    if (detected) {
+      hint.textContent = `✓ Auto-detected ${detected} bundles from packaging text`;
+    } else {
+      hint.textContent = '';
+    }
+  }
+
+  function onBundleSelectChange() {
+    const sel = document.getElementById('bundle-select');
+    const hint = document.getElementById('bundle-hint');
+    if (sel.value) {
+      hint.textContent = `✓ ${sel.value} sticker${sel.value > 1 ? 's' : ''} will be generated`;
+    }
+  }
+
+  // Init dropdown on page load
+  window.onload = () => populateBundleSelect(null);
+
+  function generate() {
+    const serial    = document.getElementById('serial').value.trim();
+    const size      = document.getElementById('size').value.trim();
+    const gsm       = document.getElementById('gsm').value.trim();
+    const packaging = document.getElementById('packaging').value.trim();
+    const selVal    = document.getElementById('bundle-select').value;
+
+    if (!serial || !size || !gsm || !packaging) {
+      alert('Please fill in all fields.');
+      return;
+    }
+
+    const total = selVal ? parseInt(selVal) : parseBundles(packaging);
+    if (!total || total < 1) {
+      alert('Please select the number of bundles.');
+      return;
+    }
+    const dateStr  = formatDate();
+    const grid     = document.getElementById('stickers-grid');
+    const section  = document.getElementById('preview-section');
+    const title    = document.getElementById('preview-title');
+
+    grid.innerHTML = '';
+    title.textContent = `${total} Sticker${total > 1 ? 's' : ''} — ${dateStr}`;
+
+    for (let i = 1; i <= total; i++) {
+      const s = document.createElement('div');
+      s.className = 'sticker';
+      s.innerHTML = `
+        <div class="sticker-number">${i}/${total}</div>
+        <div class="sticker-date">📅 ${dateStr}</div>
+        <div class="sticker-row">
+          <span class="s-label">Serial&nbsp;:</span>
+          <span class="s-value">${serial}</span>
+        </div>
+        <div class="sticker-row">
+          <span class="s-label">Size&nbsp;:</span>
+          <span class="s-value">${size}</span>
+        </div>
+        <div class="sticker-row">
+          <span class="s-label">GSM&nbsp;:</span>
+          <span class="s-value">${gsm}</span>
+        </div>
+        <div class="sticker-row">
+          <span class="s-label">Pkg&nbsp;:</span>
+          <span class="s-value">${packaging}</span>
+        </div>
+      `;
+      grid.appendChild(s);
+    }
+
+    section.style.display = 'block';
+    section.scrollIntoView({ behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>
